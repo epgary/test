@@ -13,13 +13,22 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Display SHA Values
+        with:
+          fetch-depth: 0  # Important for gh cli to work properly
+          
+      - name: Get Pull Request Number
+        id: pr
+        run: |
+          echo "pull_request_number=$(gh pr view --json number -q .number || echo '')" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Display Values
         run: |
           echo "Event name: ${{ github.event_name }}"
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            echo "PR Head SHA: ${{ github.event.pull_request.head.sha }}"
-          fi
+          echo "PR Number (from gh cli): ${{ steps.pr.outputs.pull_request_number }}"
+          echo "AAA": ${{ github.event.pull_request.number }}
+          echo "github.event.number: ${{ github.event.number }}"
           echo "GitHub SHA: ${{ github.sha }}"
           
           if [ "${{ github.event_name }}" == "pull_request" ]; then
