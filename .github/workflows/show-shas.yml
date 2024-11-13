@@ -1,0 +1,31 @@
+name: Show SHA Values
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  show-shas:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Display SHA Values
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "PR Head SHA: ${{ github.event.pull_request.head.sha }}"
+          fi
+          echo "GitHub SHA: ${{ github.sha }}"
+          
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            if [ "${{ github.event.pull_request.head.sha }}" != "${{ github.sha }}" ]; then
+              echo "Note: The SHAs are different!"
+            else
+              echo "The SHAs are identical"
+            fi
+          fi
